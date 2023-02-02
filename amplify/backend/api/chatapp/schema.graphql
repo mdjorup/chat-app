@@ -1,0 +1,11 @@
+type ChatRoom @model @auth(rules: [{ allow: owner, ownerField: "members" }]) {
+    title: String
+    members: [String!]!
+    messages: [Message] @hasMany
+}
+
+type Message @model @auth(rules: [{ allow: public, operations: [read] }]) {
+    content: String!
+    owner: String!
+    chatRoom: ChatRoom! @belongsTo
+}

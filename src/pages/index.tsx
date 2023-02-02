@@ -1,4 +1,5 @@
 import { withAuthenticator } from "@aws-amplify/ui-react";
+import { CognitoUser } from "amazon-cognito-identity-js";
 import { Auth, withSSRContext } from "aws-amplify";
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import { ChatRoom, ListChatRoomsQuery } from "../API";
 import { listChatRooms } from "../graphql/queries";
 
 function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
-    const [user, setUser] = useState();
+    const [user, setUser] = useState<CognitoUser>();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -21,7 +22,7 @@ function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
         fetchUser();
     }, []);
 
-    return <div>Hello World!</div>;
+    return <div>{user?.getUsername()}Hello World!</div>;
 }
 
 export default withAuthenticator(Home);

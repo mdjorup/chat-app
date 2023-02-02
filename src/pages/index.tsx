@@ -22,7 +22,20 @@ function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
         fetchUser();
     }, []);
 
-    return <div>{user?.getUsername()}Hello World!</div>;
+    const signOut = async () => {
+        try {
+            Auth.signOut();
+        } catch (error) {
+            console.log("error signing out: ", error);
+        }
+    };
+
+    return (
+        <div>
+            <div>{user?.getUsername()}</div>
+            <button onClick={signOut}>Sign Out</button>
+        </div>
+    );
 }
 
 export default withAuthenticator(Home);

@@ -5,7 +5,11 @@ function MessageComponent({
     text: string | undefined;
     senderUsername: string | undefined;
 }) {
-    return <div></div>;
+    return (
+        <div>
+            {text} from {senderUsername}
+        </div>
+    );
 }
 
 export default MessageComponent;

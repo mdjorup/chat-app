@@ -4,7 +4,7 @@ type ChatRoom @model @auth(rules: [{ allow: owner, ownerField: "members" }]) {
     messages: [Message] @hasMany
 }
 
-type Message @model @auth(rules: [{ allow: public, operations: [read] }]) {
+type Message @model @auth(rules: [{ allow: private }]) {
     content: String!
     owner: String!
     chatRoom: ChatRoom! @belongsTo

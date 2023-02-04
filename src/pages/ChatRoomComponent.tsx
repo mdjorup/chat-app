@@ -13,7 +13,12 @@ function ChatRoomComponent({
         <div
             onClick={onClick}
             className={`chatRoomComponent ${active ? "active" : "inactive"}`}
-        ></div>
+        >
+            <h6>{chatRoom.title}</h6>
+            {chatRoom.members.map((member) => (
+                <div key={member}>{member}</div>
+            ))}
+        </div>
     );
 }
 

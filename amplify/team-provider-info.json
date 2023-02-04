@@ -17,6 +17,12 @@
           "appId": "d1cyxzslr31dj5",
           "type": "cicd"
         }
+      },
+      "auth": {
+        "chatapp5ed0f150": {}
+      },
+      "api": {
+        "chatapp": {}
       }
     }
   }

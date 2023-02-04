@@ -1,7 +1,14 @@
 import styles from "@/styles/ChatRoomPanel.module.css";
-import { API, graphqlOperation } from "aws-amplify";
+import { CognitoUser } from "amazon-cognito-identity-js";
+import { API, Auth, graphqlOperation } from "aws-amplify";
 import { useEffect, useState } from "react";
-import { ChatRoom, ListMessagesQuery, Message } from "../API";
+import {
+    ChatRoom,
+    CreateMessageInput,
+    ListMessagesQuery,
+    Message,
+} from "../API";
+import { createMessage } from "../graphql/mutations";
 import { listMessages } from "../graphql/queries";
 import { onCreateMessage } from "../graphql/subscriptions";
 import ChatRoomComponent from "./ChatRoomComponent";
@@ -17,15 +24,22 @@ export default function ChatRoomPanel({
     const [activeChatRoom, setActiveChatRoom] = useState<ChatRoom>();
     const [messages, setMessages] = useState<Message[]>([]);
 
+    const [newMessage, setNewMessage] = useState<string>("");
+
     useEffect(() => {
         // @ts-ignore
         const subscription = API.graphql(
             graphqlOperation(onCreateMessage) //@ts-ignore
         ).subscribe({
             next: (response) => {
-                console.log(response);
+                const newMessage = response.value.data.onCreateMessage;
+                setMessages((messages) => [...messages, newMessage]);
             },
         });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
     const handleChatRoomClick = async (chatRoom: ChatRoom) => {
@@ -46,6 +60,29 @@ export default function ChatRoomPanel({
             const items = messages.items as Message[];
             setMessages([...items]);
         }
+    };
+
+    const handleNewMessage = async (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+        const message = (
+            event.currentTarget.elements.namedItem(
+                "newMessage"
+            ) as HTMLInputElement
+        ).value;
+        const user: CognitoUser = await Auth.currentAuthenticatedUser();
+
+        const newMessageInput: CreateMessageInput = {
+            content: message,
+            owner: user.getUsername(),
+            chatRoomMessagesId: activeChatRoom?.id,
+        };
+        console.log("got here2");
+        const response = await API.graphql(
+            graphqlOperation(createMessage, { input: newMessageInput })
+        );
+        setNewMessage("");
     };
 
     return (
@@ -75,7 +112,17 @@ export default function ChatRoomPanel({
                         ))}
                     {!activeChatRoom && <h3>No Selected Chat Room</h3>}
                 </div>
-                <div className="newChatWrapper "></div>
+                {activeChatRoom && (
+                    <form onSubmit={handleNewMessage}>
+                        <input
+                            type="text"
+                            name="newMessage"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                        ></input>
+                        <button>New Chat</button>
+                    </form>
+                )}
             </div>
         </div>
     );

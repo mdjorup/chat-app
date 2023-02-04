@@ -95,19 +95,6 @@ function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
                 data: CreateChatRoomMutation;
             };
             const newChatRoom = response.data.createChatRoom;
-            // const newMessageInput: CreateMessageInput = {
-            //     content: newMessage,
-            //     owner: user.getUsername(),
-            //     chatRoomMessagesId: newChatRoom?.id,
-            // };
-            // const sentMessageResponse = (await API.graphql({
-            //     query: createMessage,
-            //     authMode: "AMAZON_COGNITO_USER_POOLS",
-            //     variables: { input: newMessageInput },
-            // })) as {
-            //     auth: any;
-            //     data: CreateMessageMutation;
-            // };
         } catch (error) {
             console.log(error);
         }
@@ -118,10 +105,8 @@ function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
             <h1>Welcome, {user?.getUsername()}</h1>
             <p>Start a new chat:</p>
             <form onSubmit={handleMakeNewChatRoom}>
-                <label htmlFor="username">Username:</label>
+                <label htmlFor="username">To:</label>
                 <input type="text" name="username"></input>
-                <label htmlFor="newMessage">Message:</label>
-                <input type="text" name="newMessage"></input>
                 <label htmlFor="chatRoomTitle">New Room Title</label>
                 <input type="text" name="chatRoomTitle"></input>
                 <button type="submit">New Chat</button>

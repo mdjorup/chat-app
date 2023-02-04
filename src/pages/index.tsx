@@ -10,9 +10,9 @@ import {
     CreateChatRoomMutation,
     ListChatRoomsQuery,
 } from "../API";
+import ChatRoomPanel from "../ChatRoomPanel";
 import { createChatRoom } from "../graphql/mutations";
 import { listChatRooms } from "../graphql/queries";
-import ChatRoomPanel from "./ChatRoomPanel";
 
 function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
     const [user, setUser] = useState<CognitoUser>();
@@ -69,9 +69,6 @@ function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
         const username: string = (
             form.elements.namedItem("username") as HTMLInputElement
         ).value;
-        const newMessage: string = (
-            form.elements.namedItem("newMessage") as HTMLInputElement
-        ).value;
         const chatRoomTitle: string = (
             form.elements.namedItem("chatRoomTitle") as HTMLInputElement
         ).value;
@@ -111,7 +108,7 @@ function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
                 <input type="text" name="chatRoomTitle"></input>
                 <button type="submit">New Chat</button>
             </form>
-            <ChatRoomPanel chatRooms={chatRooms} />
+            <ChatRoomPanel chatRooms={chatRooms} user={user} />
             <button onClick={signOut}>Sign Out</button>
         </div>
     );

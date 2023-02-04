@@ -1,25 +1,27 @@
 import styles from "@/styles/ChatRoomPanel.module.css";
 import { CognitoUser } from "amazon-cognito-identity-js";
-import { API, Auth, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { useEffect, useState } from "react";
 import {
     ChatRoom,
     CreateMessageInput,
     ListMessagesQuery,
     Message,
-} from "../API";
-import { createMessage } from "../graphql/mutations";
-import { listMessages } from "../graphql/queries";
-import { onCreateMessage } from "../graphql/subscriptions";
+} from "./API";
 import ChatRoomComponent from "./ChatRoomComponent";
+import { createMessage } from "./graphql/mutations";
+import { listMessages } from "./graphql/queries";
+import { onCreateMessage } from "./graphql/subscriptions";
 import MessageComponent from "./MessageComponent";
 
 // this one renders the list of chat rooms on the left, and passes the messages into the active one on the right
 
 export default function ChatRoomPanel({
     chatRooms = [],
+    user,
 }: {
     chatRooms: ChatRoom[];
+    user: CognitoUser;
 }) {
     const [activeChatRoom, setActiveChatRoom] = useState<ChatRoom>();
     const [messages, setMessages] = useState<Message[]>([]);
@@ -32,8 +34,11 @@ export default function ChatRoomPanel({
             graphqlOperation(onCreateMessage) //@ts-ignore
         ).subscribe({
             next: (response) => {
-                const newMessage = response.value.data.onCreateMessage;
-                setMessages((messages) => [...messages, newMessage]);
+                const newMessage: Message = response.value.data.onCreateMessage;
+                console.log(newMessage);
+                if (newMessage.chatRoomMessagesId === activeChatRoom.id) {
+                    setMessages((messages) => [...messages, newMessage]);
+                }
             },
         });
 
@@ -71,7 +76,6 @@ export default function ChatRoomPanel({
                 "newMessage"
             ) as HTMLInputElement
         ).value;
-        const user: CognitoUser = await Auth.currentAuthenticatedUser();
 
         const newMessageInput: CreateMessageInput = {
             content: message,
@@ -87,7 +91,7 @@ export default function ChatRoomPanel({
 
     return (
         <div className={styles.chatRoomPanel}>
-            <div className="chatListWrapper">
+            <div className={styles.chatListWrapper}>
                 <h3>Chat Rooms</h3>
                 {chatRooms.map((cr) => (
                     <ChatRoomComponent
@@ -97,6 +101,7 @@ export default function ChatRoomPanel({
                         onClick={() => {
                             handleChatRoomClick(cr);
                         }}
+                        user={user}
                     ></ChatRoomComponent>
                 ))}
             </div>

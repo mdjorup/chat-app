@@ -1,3 +1,11 @@
-.chatRoomPanel {
-    display: flex
+
+
+
+.chatListWrapper {
+    width: 300px;
+    background-color: gray;
+    height: 80vh;
+    overflow: scroll;
+    
+    
 }

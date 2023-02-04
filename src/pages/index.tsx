@@ -1,13 +1,15 @@
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import { CognitoUser } from "amazon-cognito-identity-js";
-import { Auth, withSSRContext } from "aws-amplify";
+import { API, Auth, withSSRContext } from "aws-amplify";
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 import { ChatRoom, ListChatRoomsQuery } from "../API";
 import { listChatRooms } from "../graphql/queries";
+import ChatRoomPanel from "./ChatRoomPanel";
 
-function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
+function Home({ preChatRooms = [] }: { preChatRooms: ChatRoom[] }) {
     const [user, setUser] = useState<CognitoUser>();
+    const [chatRooms, setChatRooms] = useState<ChatRoom[]>(preChatRooms);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -22,6 +24,27 @@ function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
         fetchUser();
     }, []);
 
+    useEffect(() => {
+        const getMessages = async () => {
+            try {
+                const response = (await API.graphql({
+                    query: listChatRooms,
+                    authMode: "AMAZON_COGNITO_USER_POOLS",
+                })) as {
+                    auth: any;
+                    data: ListChatRoomsQuery;
+                };
+                setChatRooms([
+                    ...(response.data.listChatRooms?.items as ChatRoom[]),
+                ]);
+            } catch (error) {
+                console.log("error getting chat rooms");
+            }
+        };
+
+        getMessages();
+    }, [user]);
+
     const signOut = async () => {
         try {
             Auth.signOut();
@@ -32,7 +55,7 @@ function Home({ chatRooms: [] }: { chatRooms: ChatRoom[] }) {
 
     return (
         <div>
-            <div>{user?.getUsername()}</div>
+            <ChatRoomPanel chatRooms={chatRooms} />
             <button onClick={signOut}>Sign Out</button>
         </div>
     );

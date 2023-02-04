@@ -12,11 +12,11 @@
       "AmplifyAppId": "d1cyxzslr31dj5"
     },
     "categories": {
-      "auth": {
-        "chatapp5ed0f150": {}
-      },
-      "api": {
-        "chatapp": {}
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1cyxzslr31dj5",
+          "type": "cicd"
+        }
       }
     }
   }

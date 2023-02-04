@@ -1,0 +1,8 @@
+Planning
+
+Home -> contains the user retrieval & overall structure of the app
+- Also gets all the conversations
+
+Left Panel 
+- Inputs: A list of chatrooms 
+- Outputs: A stack of chatrooms 
